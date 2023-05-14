@@ -22,3 +22,59 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Background Remover</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>AI Background Remover</h1>
+  
+  <input type="file" id="imageFile" accept="image/*">
+  <button onclick="removeBackground()">Remove Background</button>
+  
+  <h2>Original Image:</h2>
+  <img id="originalImage" src="#" alt="Original Image" style="max-width: 500px;">
+
+  <h2>Background Removed Image:</h2>
+  <img id="removedImage" src="#" alt="Background Removed Image" style="max-width: 500px;">
+  
+  <script>
+    function removeBackground() {
+      var fileInput = document.getElementById('imageFile');
+      var file = fileInput.files[0];
+      var formData = new FormData();
+      formData.append('image_file', file);
+
+      $.ajax({
+        url: 'https://api.remove.bg/v1.0/removebg',
+        type: 'POST',
+        headers: {
+          'X-Api-Key': 'YOUR_API_KEY' // Replace with your Remove.bg API key
+        },
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(result) {
+          var imageUrl = result.data.result_url;
+          document.getElementById('removedImage').src = imageUrl;
+        },
+        error: function(error) {
+          console.error('Background removal failed:', error);
+        }
+      });
+    }
+
+    document.getElementById('imageFile').addEventListener('change', function(event) {
+      var file = event.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function(event) {
+        document.getElementById('originalImage').src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
